@@ -122,6 +122,20 @@ public void run()
 
 		// draw a PacMan
 		gBuf.fillArc(x, y, PACMAN_SIZE, PACMAN_SIZE, 20, 320);
+		
+		// Make the mouth chomp
+				mouthOpenAngle = mouthOpenAngle + dMouthOpenAngle;
+
+				if(mouthOpenAngle > maxMouthOpenAngle)
+				{
+					mouthOpenAngle = maxMouthOpenAngle;
+					dMouthOpenAngle = - 5;
+				}
+				if (mouthOpenAngle < minMouthOpenAngle)
+				{
+					mouthOpenAngle = minMouthOpenAngle;
+					dMouthOpenAngle = 5;
+				}
 
 		// repaint() will call paint(Graphics) which will call update(Graphics)
 		repaint();
