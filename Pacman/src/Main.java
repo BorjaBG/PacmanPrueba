@@ -70,6 +70,14 @@ public void run()
 	int dMouthOpenAngle = 5;
 	int maxMouthOpenAngle = 100;
 	int minMouthOpenAngle = 1;
+	
+	//Para las colisiones
+	int nextX;
+	int nextY;
+
+	int row;
+	int col;
+	boolean hitWall = false;
 
 	while (updateThread != null)
 	{
@@ -92,6 +100,33 @@ public void run()
 		//Move PacMan
 		x = x + dx;
 		y = y + dy;
+		//Mas colisiones
+		nextX = x + dx;
+		nextY = y + dy;
+		hitWall = false;
+		
+		for (int xCorner = 0; xCorner < PACMAN_SIZE; xCorner += PACMAN_SIZE - 1)
+		{
+			for (int yCorner = 0; yCorner < PACMAN_SIZE; yCorner += PACMAN_SIZE - 1)
+			{
+				col = (nextX + xCorner) / PACMAN_SIZE;
+				row = (nextY + yCorner) / PACMAN_SIZE;
+				if (row < MAZE_SIZE && col < MAZE_SIZE)
+				{
+					if (mazeArray[row][col] == 1)
+					{
+						hitWall = true;
+						break;
+					}
+				}
+			}
+		}
+		
+		//Move PacMan
+		if (!hitWall){
+			x = nextX;
+			y = nextY;
+		}
 
 		// Don't let him go off the sides of the screen
 		if (x > MAX_X - PACMAN_SIZE)
@@ -116,25 +151,40 @@ public void run()
 			y = 0;
 			dy = 0;
 		}
+		
+		// Make the mouth chomp
+		mouthOpenAngle = mouthOpenAngle + dMouthOpenAngle;
+
+		if(mouthOpenAngle > maxMouthOpenAngle)
+		{
+			mouthOpenAngle = maxMouthOpenAngle;
+			dMouthOpenAngle = - 5;
+		}
+		if (mouthOpenAngle < minMouthOpenAngle)
+		{
+			mouthOpenAngle = minMouthOpenAngle;
+			dMouthOpenAngle = 5;
+		}
 
 		// set the drawing color
 		gBuf.setColor(Color.yellow);
 
 		// draw a PacMan
-		gBuf.fillArc(x, y, PACMAN_SIZE, PACMAN_SIZE, 20, 320);
+		gBuf.fillArc(x, y, PACMAN_SIZE, PACMAN_SIZE, mouthStartAngle + mouthOpenAngle/2,360-mouthOpenAngle);
 		
-		// Make the mouth chomp
-				mouthOpenAngle = mouthOpenAngle + dMouthOpenAngle;
+		// draw maze
 
-				if(mouthOpenAngle > maxMouthOpenAngle)
+				gBuf.setColor(Color.cyan);
+
+				for (row = 0; row < MAZE_SIZE; row++)
 				{
-					mouthOpenAngle = maxMouthOpenAngle;
-					dMouthOpenAngle = - 5;
-				}
-				if (mouthOpenAngle < minMouthOpenAngle)
-				{
-					mouthOpenAngle = minMouthOpenAngle;
-					dMouthOpenAngle = 5;
+					for (col = 0; col < MAZE_SIZE; col++)
+					{
+						if (mazeArray[row][col] == 1)
+						{
+							gBuf.fillRect(col * PACMAN_SIZE, row * PACMAN_SIZE, PACMAN_SIZE, PACMAN_SIZE);
+						}
+					}
 				}
 
 		// repaint() will call paint(Graphics) which will call update(Graphics)
@@ -178,12 +228,14 @@ public boolean keyDown(java.awt.Event e, int key)
 	{
 	   	dx = -5;
 	   	dy = 0;
+	   	mouthStartAngle = 180;
 		return false;
 	}
 	if (key == 1007) // right arrow
 	{
  		dx = 5;
  		dy = 0;
+ 		mouthStartAngle = 0;
 	    return false;
 	}
 
@@ -191,12 +243,14 @@ public boolean keyDown(java.awt.Event e, int key)
 	{
 	  	dy = -5;
 	  	dx = 0;
+	  	mouthStartAngle = 90;
 		return false;
 	}
 	if (key == 1005) // down arrow
 	{
 	 	dy = 5;
 	 	dx = 0;
+	 	mouthStartAngle = 270;
 		return false;
 	}
 
@@ -274,6 +328,23 @@ public void update(Graphics g)
 
 	int dx = 0;
 	int dy = 0;
+	final static int MAZE_SIZE = 13;
+	int[][] mazeArray =
+		{ 	{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
+			{0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0},
+			{0,1,0,0,0,0,0,0,0,0,0,0,0,1,1,0,0,0,0,1,0},
+			{0,1,0,0,0,1,1,1,0,0,0,0,1,1,1,1,1,1,0,0,0},
+			{0,1,0,0,0,0,0,0,0,1,0,1,0,1,1,1,1,0,0,1,1},
+			{0,1,0,0,0,1,1,1,0,1,0,1,0,0,0,0,1,1,1,0,0},
+			{0,1,0,0,0,0,0,0,0,1,0,1,1,1,1,0,0,0,0,1,0},
+			{0,0,0,0,0,1,1,1,1,1,0,1,1,0,0,0,1,1,1,1,0},
+			{0,1,0,1,0,0,0,0,0,0,0,1,1,1,1,0,0,1,1,1,0},
+			{0,1,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0},
+			{0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,0},
+			{0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0,1,0},
+			{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0}
+		};
+	int mouthStartAngle = 180;
 	static final int PACMAN_SIZE = 30;
 	int x = 0;
 	int y = 0;
