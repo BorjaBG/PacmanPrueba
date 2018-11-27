@@ -72,12 +72,14 @@ public void run()
 	int minMouthOpenAngle = 1;
 	
 	//Para las colisiones
-	int nextX;
-	int nextY;
+	int nextX = 0;
+	int nextY = 0;
 
 	int row;
 	int col;
 	boolean hitWall = false;
+	
+	int i;
 
 	while (updateThread != null)
 	{
@@ -96,14 +98,58 @@ public void run()
 
 		// clear what we drew last time.
 		gBuf.clearRect(0, 0, MAX_X, MAX_Y);
+		
+		for (i = 1; i >= 0; i--)
+		{
+			nextX = x + dx[i];
+			nextY = y + dy[i];
+			hitWall = false;
 
-		//Move PacMan
-		x = x + dx;
-		y = y + dy;
-		//Mas colisiones
-		nextX = x + dx;
-		nextY = y + dy;
-		hitWall = false;
+			// Process each "cell" of the maze and paint it correctly
+			for (int xCorner = 0; xCorner < PACMAN_SIZE; xCorner += PACMAN_SIZE - 1)
+			{
+				for (int yCorner = 0; yCorner < PACMAN_SIZE; yCorner += PACMAN_SIZE - 1)
+				{
+					col = (nextX + xCorner) / PACMAN_SIZE;
+					row = (nextY + yCorner) / PACMAN_SIZE;
+					if (row < MAZE_SIZE && col < MAZE_SIZE)
+					{
+						if (mazeArray[row][col] == 1)
+						{
+							hitWall = true;
+							break;
+						}
+					}
+				}
+			}
+			if (!hitWall)
+			{
+				if (i == 1)
+				{
+					dx[0] = dx[1];
+					dy[0] = dy[1];
+				}
+				break;
+			}
+
+		}
+
+		if (dx[0] > 0)
+		{
+			mouthStartAngle = 0;
+		}
+		else if (dx[0] < 0)
+		{
+			mouthStartAngle = 180;
+		}
+		else if (dy[0] > 0)
+		{
+			mouthStartAngle = 270;
+		}
+		else if (dy[0] < 0)
+		{
+			mouthStartAngle = 90;
+		}
 		
 		for (int xCorner = 0; xCorner < PACMAN_SIZE; xCorner += PACMAN_SIZE - 1)
 		{
@@ -123,33 +169,45 @@ public void run()
 		}
 		
 		//Move PacMan
-		if (!hitWall){
+		if (!hitWall)
+		{
 			x = nextX;
 			y = nextY;
+		}
+		else
+		{
+			dx[0] = 0;
+			dx[1] = 0;
+			dy[0] = 0;
+			dy[1] = 0;
 		}
 
 		// Don't let him go off the sides of the screen
 		if (x > MAX_X - PACMAN_SIZE)
 		{
 			x = MAX_X - PACMAN_SIZE;
-			dx = 0;
+			dx[0] = 0;
+			dx[1] = 0;
 		}
 		if (x < 0)
 		{
 			x = 0;
-			dx = 0;
+			dx[0] = 0;
+			dx[1] = 0;
 		}
 
 		// Don't let him go off the top or bottom of the screen
 		if (y > MAX_Y - PACMAN_SIZE)
 		{
 			y = MAX_Y - PACMAN_SIZE;
-			dy = 0;
+			dy[i] = 0;
+			dy[1] = 0;
 		}
 		if (y < 0)
 		{
 			y = 0;
-			dy = 0;
+			dy[i] = 0;
+			dy[1] = 0;
 		}
 		
 		// Make the mouth chomp
@@ -226,31 +284,67 @@ public boolean keyDown(java.awt.Event e, int key)
 
 	if (key == 1006) // left arrow
 	{
-	   	dx = -5;
-	   	dy = 0;
-	   	mouthStartAngle = 180;
+		if (dx[0] == 0 && dy[0] == 0)
+		{
+			dx[0] = -5;
+			dx[1] = -5;
+			dy[0] = 0;
+			dy[1] = 0;
+		}
+		else
+		{
+			dx[1] = -5;
+			dy[1] = 0;
+		}
 		return false;
 	}
 	if (key == 1007) // right arrow
 	{
- 		dx = 5;
- 		dy = 0;
- 		mouthStartAngle = 0;
-	    return false;
+		if (dx[0] == 0 && dy[0] == 0)
+		{
+			dx[0] = 5;
+			dx[1] = 5;
+			dy[0] = 0;
+			dy[1] = 0;
+		}
+		else
+		{
+			dx[1] = 5;
+			dy[1] = 0;
+		}
+		return false;
 	}
 
 	if (key == 1004) // up arrow
 	{
-	  	dy = -5;
-	  	dx = 0;
-	  	mouthStartAngle = 90;
+		if (dx[0] == 0 && dy[0] == 0)
+		{
+			dx[0] = 0;
+			dx[1] = 0;
+			dy[0] = -5;
+			dy[1] = -5;
+		}
+		else
+		{
+			dx[1] = 0;
+			dy[1] = -5;
+		}
 		return false;
 	}
 	if (key == 1005) // down arrow
 	{
-	 	dy = 5;
-	 	dx = 0;
-	 	mouthStartAngle = 270;
+		if (dx[0] == 0 && dy[0] == 0)
+		{
+			dx[0] = 0;
+			dx[1] = 0;
+			dy[0] = 5;
+			dy[1] = 5;
+		}
+		else
+		{
+			dx[1] = 0;
+			dy[1] = 5;
+		}
 		return false;
 	}
 
@@ -278,13 +372,11 @@ public boolean keyUp(java.awt.Event e, int key)
 	
 	if (key == 1006 || key == 1007)  // left or right key released
 	{
-		dx = 0;
 		return false;
 	}
 
 	if (key == 1004 || key == 1005) // up or down key released.
 	{
-		dy = 0;
 		return false;
 	}
 
@@ -326,9 +418,10 @@ public void update(Graphics g)
 	static final int MAX_X = 800;  // widest the playing screen can be
 	static final int MAX_Y = 800;  // tallest the playing screen can be
 
-	int dx = 0;
-	int dy = 0;
+	int dx[] = {0,0}; // amount x position will change
+	int dy[] = {0,0}; // amount y will change
 	final static int MAZE_SIZE = 13;
+	//Este es el mapa, el 0 es abierto y el 1 es una pared
 	int[][] mazeArray =
 		{ 	{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
 			{0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0},
