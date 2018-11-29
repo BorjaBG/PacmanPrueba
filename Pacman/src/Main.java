@@ -6,6 +6,8 @@ import java.net.*;
 import java.awt.Font;
 import java.util.Random;
 
+import javax.swing.plaf.basic.BasicInternalFrameTitlePane.MaximizeAction;
+
 public final class Main extends Applet implements Runnable{
 
 	/**
@@ -13,9 +15,58 @@ public final class Main extends Applet implements Runnable{
 	 */
 	private static final long serialVersionUID = 1L;
 
+	Graphics gBuf;	// used for double-buffered graphics
+	Image imgBuf;	// also used for double-buffered graphics
+	
+	static final int PACMAN_SIZE = 40;
+	
 	Thread updateThread;	// thread in which the game will run
 	long startTime;			// used to keep track of timing and to prevent applet from running too fast
+	
+	int x = 0;		//Posicion x de Pacman
+	int dx[] = {0,0}; // amount x position will change
+	int y = 0;		//Posicion y de Pacman
+	int dy[] = {0,0}; // amount y will change
+	
+	int mouthStartAngle = 180;		//Direccion a la que Pacman apunta
+	
+	//Este es el mapa, el 0 es abierto y el 1 es una pared
+		int[][] mazeArray =
+			{ 	{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
+				{0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0},
+				{0,1,0,0,0,0,0,0,0,0,0,0,0,1,1,0,0,0,0,1,0},
+				{0,1,0,0,0,1,1,1,0,0,0,0,1,1,1,1,1,1,0,0,0},
+				{0,1,0,0,0,0,0,0,0,1,0,1,0,1,1,1,1,0,0,1,1},
+				{0,1,0,0,0,1,1,1,0,1,0,1,0,0,0,0,1,1,1,0,0},
+				{0,1,0,0,0,0,0,0,0,1,0,1,1,1,1,0,0,0,0,1,0},
+				{0,0,0,0,0,1,1,1,1,1,0,1,1,0,0,0,1,1,1,1,0},
+				{0,1,0,1,0,0,0,0,0,0,0,1,1,1,1,0,0,1,1,1,0},
+				{0,1,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0},
+				{0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,0},
+				{0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0,1,0},
+				{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0}
+			};
+		final static int MAZE_SIZE = 13;
+		static final int MAX_X = PACMAN_SIZE * MAZE_SIZE;  // widest the playing screen can be
+		static final int MAX_Y = PACMAN_SIZE * MAZE_SIZE;  // tallest the playing screen can be
+		final static int SPEED = 10;
+		
+public void getMainGraphics() { // Load and process the most common graphics{
+		MediaTracker tracker;
+		int i = 0;
 
+		tracker = new MediaTracker(this);
+
+		// this code doesn't load any graphics yet!
+
+		try{
+			tracker.waitForAll();
+		}catch (InterruptedException e)
+		{
+	}
+
+}
+		
 
 public void init()
 {
@@ -40,24 +91,138 @@ public void init()
 	requestFocus();
 }
 
-
-public void getMainGraphics() // Load and process the most common graphics
+public boolean keyDown(java.awt.Event e, int key)
 {
-	MediaTracker tracker;
-	int i = 0;
 
-	tracker = new MediaTracker(this);
+	// This method handles key presses.
+	// For now all the statements are placeholders.
 
-	// this code doesn't load any graphics yet!
+	// it is nice to have a print statement here.  
+	// it can be quickly uncommented and the output
+	// used to get keycodes since I am too lazy to
+	// look them up.
+	
+	//System.out.println(key);
 
-	try
+	if (key == 1006) // left arrow
 	{
-		tracker.waitForAll();
+		if (dx[0] == 0 && dy[0] == 0)
+		{
+			dx[0] = -SPEED;
+			dx[1] = -SPEED;
+			dy[0] = 0;
+			dy[1] = 0;
+		}
+		else
+		{
+			dx[1] = -SPEED;
+			dy[1] = 0;
+		}
+		return false;
 	}
-	catch (InterruptedException e)
+	if (key == 1007) // right arrow
 	{
+		if (dx[0] == 0 && dy[0] == 0)
+		{
+			dx[0] = SPEED;
+			dx[1] = SPEED;
+			dy[0] = 0;
+			dy[1] = 0;
+		}
+		else
+		{
+			dx[1] = SPEED;
+			dy[1] = 0;
+		}
+		return false;
 	}
 
+	if (key == 1004) // up arrow
+	{
+		if (dx[0] == 0 && dy[0] == 0)
+		{
+			dx[0] = 0;
+			dx[1] = 0;
+			dy[0] = -SPEED;
+			dy[1] = -SPEED;
+		}
+		else
+		{
+			dx[1] = 0;
+			dy[1] = -SPEED;
+		}
+		return false;
+	}
+	if (key == 1005) // down arrow
+	{
+		if (dx[0] == 0 && dy[0] == 0)
+		{
+			dx[0] = 0;
+			dx[1] = 0;
+			dy[0] = SPEED;
+			dy[1] = SPEED;
+		}
+		else
+		{
+			dx[1] = 0;
+			dy[1] = SPEED;
+		}
+		return false;
+	}
+
+	if (key == 32) // space bar
+	{
+		
+		return false;
+	}
+
+	if (key == 112) // 'P' key
+	{
+		
+		return false;
+	}
+
+	return false;
+}
+
+public boolean keyUp(java.awt.Event e, int key)
+{
+	// This method is called when a key is released.
+
+	// right now it just has place holders.
+	
+	
+	if (key == 1006 || key == 1007)  // left or right key released
+	{
+		return false;
+	}
+
+	if (key == 1004 || key == 1005) // up or down key released.
+	{
+		return false;
+	}
+
+	if (key == 32)  // space bar released
+	{
+		
+		return false;
+	}
+	return false;
+}
+
+//To ensure Java 1.1 compatibility, request focus on mouseDown
+public boolean mouseDown(java.awt.Event e, int x, int y)
+{
+	requestFocus();
+	return false;
+}
+
+public void paint(Graphics g) // Draw the control panel and stuff
+{
+	// Since there are no borders or anything
+	// static to draw yet we only need to call
+	// the update method.
+	update(g);
 }
 
 
@@ -98,6 +263,14 @@ public void run()
 
 		// clear what we drew last time.
 		gBuf.clearRect(0, 0, MAX_X, MAX_Y);
+		
+		//Los puntos
+		int curCol = (x + PACMAN_SIZE/2)/PACMAN_SIZE;
+		int curRow = (y + PACMAN_SIZE/2)/PACMAN_SIZE;
+		
+		if (mazeArray[curRow][curCol] == 2) {
+			mazeArray[curRow][curCol] = 0;
+		}
 		
 		for (i = 1; i >= 0; i--)
 		{
@@ -150,23 +323,7 @@ public void run()
 		{
 			mouthStartAngle = 90;
 		}
-		
-		for (int xCorner = 0; xCorner < PACMAN_SIZE; xCorner += PACMAN_SIZE - 1)
-		{
-			for (int yCorner = 0; yCorner < PACMAN_SIZE; yCorner += PACMAN_SIZE - 1)
-			{
-				col = (nextX + xCorner) / PACMAN_SIZE;
-				row = (nextY + yCorner) / PACMAN_SIZE;
-				if (row < MAZE_SIZE && col < MAZE_SIZE)
-				{
-					if (mazeArray[row][col] == 1)
-					{
-						hitWall = true;
-						break;
-					}
-				}
-			}
-		}
+
 		
 		//Move PacMan
 		if (!hitWall)
@@ -216,7 +373,7 @@ public void run()
 		if(mouthOpenAngle > maxMouthOpenAngle)
 		{
 			mouthOpenAngle = maxMouthOpenAngle;
-			dMouthOpenAngle = - 5;
+			dMouthOpenAngle = -10;
 		}
 		if (mouthOpenAngle < minMouthOpenAngle)
 		{
@@ -231,20 +388,24 @@ public void run()
 		gBuf.fillArc(x, y, PACMAN_SIZE, PACMAN_SIZE, mouthStartAngle + mouthOpenAngle/2,360-mouthOpenAngle);
 		
 		// draw maze
+		gBuf.setColor(Color.cyan);
 
-				gBuf.setColor(Color.cyan);
-
-				for (row = 0; row < MAZE_SIZE; row++)
-				{
-					for (col = 0; col < MAZE_SIZE; col++)
-					{
-						if (mazeArray[row][col] == 1)
-						{
-							gBuf.fillRect(col * PACMAN_SIZE, row * PACMAN_SIZE, PACMAN_SIZE, PACMAN_SIZE);
-						}
-					}
+		for (row = 0; row < MAZE_SIZE; row++){
+			for (col = 0; col < MAZE_SIZE; col++){
+				if (mazeArray[row][col] == 1){
+					gBuf.setColor(Color.cyan);
+					gBuf.fillRect(col * PACMAN_SIZE, row * PACMAN_SIZE, PACMAN_SIZE, PACMAN_SIZE);
+				}else if(mazeArray[row][col] == 2) {
+					gBuf.setColor(Color.white);
+					gBuf.fillArc(col * PACMAN_SIZE + PACMAN_SIZE/2 - 5, row * PACMAN_SIZE + PACMAN_SIZE/2 - 5, 10, 10, 0, 360);
 				}
-
+			}
+		}
+		
+		gBuf.setColor(Color.yellow);
+		
+		//Dibujar a Pacman
+		gBuf.fillArc(x, y, PACMAN_SIZE, PACMAN_SIZE, mouthStartAngle + mouthOpenAngle / 2, 360 - mouthOpenAngle);
 		// repaint() will call paint(Graphics) which will call update(Graphics)
 		repaint();
 	}
@@ -269,141 +430,6 @@ public void stop()
 }
 
 
-public boolean keyDown(java.awt.Event e, int key)
-{
-
-	// This method handles key presses.
-	// For now all the statements are placeholders.
-
-	// it is nice to have a print statement here.  
-	// it can be quickly uncommented and the output
-	// used to get keycodes since I am too lazy to
-	// look them up.
-	
-	//System.out.println(key);
-
-	if (key == 1006) // left arrow
-	{
-		if (dx[0] == 0 && dy[0] == 0)
-		{
-			dx[0] = -5;
-			dx[1] = -5;
-			dy[0] = 0;
-			dy[1] = 0;
-		}
-		else
-		{
-			dx[1] = -5;
-			dy[1] = 0;
-		}
-		return false;
-	}
-	if (key == 1007) // right arrow
-	{
-		if (dx[0] == 0 && dy[0] == 0)
-		{
-			dx[0] = 5;
-			dx[1] = 5;
-			dy[0] = 0;
-			dy[1] = 0;
-		}
-		else
-		{
-			dx[1] = 5;
-			dy[1] = 0;
-		}
-		return false;
-	}
-
-	if (key == 1004) // up arrow
-	{
-		if (dx[0] == 0 && dy[0] == 0)
-		{
-			dx[0] = 0;
-			dx[1] = 0;
-			dy[0] = -5;
-			dy[1] = -5;
-		}
-		else
-		{
-			dx[1] = 0;
-			dy[1] = -5;
-		}
-		return false;
-	}
-	if (key == 1005) // down arrow
-	{
-		if (dx[0] == 0 && dy[0] == 0)
-		{
-			dx[0] = 0;
-			dx[1] = 0;
-			dy[0] = 5;
-			dy[1] = 5;
-		}
-		else
-		{
-			dx[1] = 0;
-			dy[1] = 5;
-		}
-		return false;
-	}
-
-	if (key == 32) // space bar
-	{
-		
-		return false;
-	}
-
-	if (key == 112) // 'P' key
-	{
-		
-		return false;
-	}
-
-	return false;
-}
-	
-public boolean keyUp(java.awt.Event e, int key)
-{
-	// This method is called when a key is released.
-
-	// right now it just has place holders.
-	
-	
-	if (key == 1006 || key == 1007)  // left or right key released
-	{
-		return false;
-	}
-
-	if (key == 1004 || key == 1005) // up or down key released.
-	{
-		return false;
-	}
-
-	if (key == 32)  // space bar released
-	{
-		
-		return false;
-	}
-	return false;
-}
-
-// To ensure Java 1.1 compatibility, request focus on mouseDown
-public boolean mouseDown(java.awt.Event e, int x, int y)
-{
-	requestFocus();
-	return false;
-}
-
-
-public void paint(Graphics g) // Draw the control panel and stuff
-{
-	// Since there are no borders or anything
-	// static to draw yet we only need to call
-	// the update method.
-	update(g);
-}
-
 public void update(Graphics g)
 {
 	// draw the offscreen buffer to the screen!
@@ -413,33 +439,5 @@ public void update(Graphics g)
 
 }
 
-	Graphics gBuf;	// used for double-buffered graphics
-	Image imgBuf;	// also used for double-buffered graphics
-	static final int MAX_X = 800;  // widest the playing screen can be
-	static final int MAX_Y = 800;  // tallest the playing screen can be
-
-	int dx[] = {0,0}; // amount x position will change
-	int dy[] = {0,0}; // amount y will change
-	final static int MAZE_SIZE = 13;
-	//Este es el mapa, el 0 es abierto y el 1 es una pared
-	int[][] mazeArray =
-		{ 	{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
-			{0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0},
-			{0,1,0,0,0,0,0,0,0,0,0,0,0,1,1,0,0,0,0,1,0},
-			{0,1,0,0,0,1,1,1,0,0,0,0,1,1,1,1,1,1,0,0,0},
-			{0,1,0,0,0,0,0,0,0,1,0,1,0,1,1,1,1,0,0,1,1},
-			{0,1,0,0,0,1,1,1,0,1,0,1,0,0,0,0,1,1,1,0,0},
-			{0,1,0,0,0,0,0,0,0,1,0,1,1,1,1,0,0,0,0,1,0},
-			{0,0,0,0,0,1,1,1,1,1,0,1,1,0,0,0,1,1,1,1,0},
-			{0,1,0,1,0,0,0,0,0,0,0,1,1,1,1,0,0,1,1,1,0},
-			{0,1,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0},
-			{0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,0},
-			{0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0,1,0},
-			{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0}
-		};
-	int mouthStartAngle = 180;
-	static final int PACMAN_SIZE = 30;
-	int x = 0;
-	int y = 0;
 }
 
