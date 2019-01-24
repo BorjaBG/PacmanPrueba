@@ -8,12 +8,15 @@ public class Fantasma {
 	private boolean lastChoiceX = false;
 
 	private int speed = 6;
+	//private comprobarpos posicion = new comprobarpos();
 	/**
 	 * Ghost constructor comment.
 	 */
 	public Fantasma() {
 		super();
 	}
+	
+	// Genera el camino que seguira el fantasma
 	private void generatePath(int x, int y, int pX, int pY) {
 		int oldDirX = dirX;
 		int oldDirY = dirY;
@@ -62,8 +65,9 @@ public class Fantasma {
 		}
 
 		if (dirX != 0 && dirY != 0) {
-			System.out.println("Huh!0?");
+			System.out.println("¡¿Que?!");
 		}
+	
 
 	}
 	public int getX() {
@@ -72,6 +76,8 @@ public class Fantasma {
 	public int getY() {
 		return y;
 	}
+	
+	// Comprueba si tiene opcion de llegar a Pacman
 	private boolean hasChoice() {
 		if (x % Main.PACMAN_SIZE == 0 && y % Main.PACMAN_SIZE == 0) {
 			int mazeX = x / Main.PACMAN_SIZE;
@@ -101,11 +107,13 @@ public class Fantasma {
 			int mazeY = y / Main.PACMAN_SIZE;
 
 			generatePath(mazeX, mazeY, pacX, pacY);
+			
 
 		}
 
 		x += dirX * speed;
 		y += dirY * speed;
+		
 
 	}
 
@@ -130,4 +138,5 @@ public class Fantasma {
 		generatePath(anX, aY, anX, aY);
 
 	}
+	
 }

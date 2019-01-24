@@ -23,23 +23,23 @@ public final class Main extends Applet implements Runnable{
 	public static boolean visited = false;
 	public static final boolean walls[] = new boolean[4];
 
-	Graphics gBuf;	// used for double-buffered graphics
-	Image imgBuf;	// also used for double-buffered graphics
+	Graphics gBuf;	// Se utiliza para un doble buffer de los graficos
+	Image imgBuf;	// Tambien se utiliza para un doble buffer de los graficos
 	
 	static final int PACMAN_SIZE = 36;
 	
-	Thread updateThread;	// thread in which the game will run
-	long startTime;			// used to keep track of timing and to prevent applet from running too fast
+	Thread updateThread;	// Hilo en el que funcionara el juego
+	long startTime;			// Cuenta el tiempo y evita que el applet funcione muy rapido
 	
 	int x = 0;		//Posicion x de Pacman
-	int dx[] = {0,0}; // amount x position will change
+	int dx[] = {0,0}; // cantidad que la x va ha cambiar
 	int y = 0;		//Posicion y de Pacman
-	int dy[] = {0,0}; // amount y will change
+	int dy[] = {0,0}; // cantidad que la y va ha cambiar
 	
 	
-	int curCol; //the column pacman is 
-	int curRow; //the row pacman is in
-	int nextX; // the next position of pacman in pixels= 9 * PACMAN_SIZE;
+	int curCol; //La columna en la que esta Pacman
+	int curRow; //La fila en la que esta Pacman
+	int nextX; // La proxima posicion de Pacman en pixeles= 9 * PACMAN_SIZE;
 	int nextY; // = 9 * PACMAN_SIZE;
 	
 	int mouthStartAngle = 180;		//Direccion a la que Pacman apunta
@@ -66,20 +66,19 @@ public final class Main extends Applet implements Runnable{
 				
 			};
 		final static int MAZE_SIZE = 13;
-		static final int MAX_X = PACMAN_SIZE * MAZE_SIZE;  // widest the playing screen can be
-		static final int MAX_Y = PACMAN_SIZE * MAZE_SIZE;  // tallest the playing screen can be
+		static final int MAX_X = PACMAN_SIZE * MAZE_SIZE;  // Maxima anchura de la ventana
+		static final int MAX_Y = PACMAN_SIZE * MAZE_SIZE;  // Maxima altura de la ventana
 		final static int SPEED = 6;
 		
 		private Fantasma fantasma = new Fantasma();
+		//private comprobarpos posicion = new comprobarpos();
 		
-public void getMainGraphics() { // Load and process the most common graphics{
+public void getMainGraphics() { // Carga y procesa los graficos mas basicos (no funciona){
 		MediaTracker tracker;
 		int i = 0;
 
 		tracker = new MediaTracker(this);
-
 		// this code doesn't load any graphics yet!
-
 		try{
 			tracker.waitForAll();
 		}catch (InterruptedException e)
@@ -91,44 +90,35 @@ public void getMainGraphics() { // Load and process the most common graphics{
 
 public void init()
 {
-	// Make the applet window the size we want it to be
+	// Pone del tamaño que queramos la ventana del applet
 	resize(MAX_X, MAX_Y);
 
 	// Load the images we will use from the web
 	getMainGraphics();
 
-	// Garbage collection call.  Not really needed.
+	// Garbage collector
 	System.gc();
 
-	// Make a black background
+	// Fondo
 	setBackground(Color.black);
 
-	// Set up double-buffered graphics.
-	// This allows us to draw without flickering.
+	// Se utiliza para que se recargen los graficos sin que parpadee la pantalla
 	imgBuf = createImage(MAX_X, MAX_Y);
 	gBuf = imgBuf.getGraphics();
 
 	fantasma.setMaze(mazeArray);
 	fantasma.setXY(3, 3);
 	
-	// try to grab the keyboard focus.
-	//requestFocus();
+	/*// try to grab the keyboard focus.
+	requestFocus();*/
 }
 
 public boolean keyDown(java.awt.Event e, int key)
 {
 
-	// This method handles key presses.
-	// For now all the statements are placeholders.
+	// Este metodo se utiliza cundo pulsas una de las teclas
 
-	// it is nice to have a print statement here.  
-	// it can be quickly uncommented and the output
-	// used to get keycodes since I am too lazy to
-	// look them up.
-	
-	//System.out.println(key);
-
-	if (key == LEFT_ARROW_BUTTON) // left arrow
+	if (key == LEFT_ARROW_BUTTON) // Flecha a la izquierda
 	{
 		if (dx[0] == 0 && dy[0] == 0) {
 			dx[0] = -SPEED;
@@ -141,7 +131,7 @@ public boolean keyDown(java.awt.Event e, int key)
 		}
 		return false;
 	}
-	if (key == RIGHT_ARROW_BUTTON) // right arrow
+	if (key == RIGHT_ARROW_BUTTON) // Flecha a la derecha
 	{
 	if (dx[0] == 0 && dy[0] == 0) {
 		dx[0] = SPEED;
@@ -155,7 +145,7 @@ public boolean keyDown(java.awt.Event e, int key)
 	return false;
 }
 
-if (key == UP_ARROW_BUTTON) // up arrow
+if (key == UP_ARROW_BUTTON) // Flecha hacia arriba
 	{
 	if (dx[0] == 0 && dy[0] == 0) {
 		dx[0] = 0;
@@ -169,7 +159,7 @@ if (key == UP_ARROW_BUTTON) // up arrow
 
 	return false;
 }
-if (key == DOWN_ARROW_BUTTON) // down arrow
+if (key == DOWN_ARROW_BUTTON) // Flecha hacia abajo
 	{
 	if (dx[0] == 0 && dy[0] == 0) {
 		dx[0] = 0;
@@ -183,12 +173,7 @@ if (key == DOWN_ARROW_BUTTON) // down arrow
 	return false;
 }
 
-if (key == SPACE_BAR) // space bar
-	{
-	return false;
-}
-
-if (key == P_BUTTON) // 'P' key
+if (key == SPACE_BAR) // Barra espaciadora
 	{
 	return false;
 }
@@ -197,20 +182,19 @@ return false;
 }
 
 public boolean keyUp(java.awt.Event e, int key) {
-	// This method is called when a key is released.
-	// right now it just has place holders.
+	// Este metodo se utiliza al soltar alguna de las teclas utilizadas, pero ahora mismo no esta en uso
 
-	if (key == LEFT_ARROW_BUTTON || key == RIGHT_ARROW_BUTTON) // left or right key released
+	if (key == LEFT_ARROW_BUTTON || key == RIGHT_ARROW_BUTTON) // Soltar flecha izquierda derecha
 		{
 		return false;
 	}
 
-	if (key == UP_ARROW_BUTTON || key == DOWN_ARROW_BUTTON) // up or down key released.
+	if (key == UP_ARROW_BUTTON || key == DOWN_ARROW_BUTTON) // Soltar flecha arriba o abajo
 		{
 		return false;
 	}
 
-	if (key == SPACE_BAR) // space bar released
+	if (key == SPACE_BAR) // Barra espaciadora
 		{
 
 		return false;
@@ -218,25 +202,20 @@ public boolean keyUp(java.awt.Event e, int key) {
 	return false;
 }
 
-// To ensure Java 1.1 compatibility, request focus on mouseDown
+// Pide el focus cuando se clicka en la ventana
 public boolean mouseDown(java.awt.Event e, int x, int y) {
 	requestFocus();
 	return false;
 }
 
-public void paint(Graphics g) // Draw the control panel and stuff
+public void paint(Graphics g) // Dibujaria varias cosas estaticas en pantalla pero al no haberlas solo llama al update
 {
-	// Since there are no borders or anything
-	// static to draw yet we only need to call
-	// the update method.
 	update(g);
 }
 
 
 public void run() {
-	// This is the most important method.  It loops over and
-	// over again as the game is running.  It makes the calls
-	// that move things and then draw them.
+	//Es el metodo mas importante ya que esta todo el tiempo activo y hace las llamadas necesarias
 
 	int mouthOpenAngle = 20;
 	int dMouthOpenAngle = 5;
@@ -255,14 +234,14 @@ public void run() {
 
 	int pellets = 0;
 
-	//		try to grab the keyboard focus.
+	//	Intenta coger el focus del teclado
 	requestFocus();
 	
 	while (updateThread != null) {
 		doComputeSleepTime();
 		startTime = System.currentTimeMillis() + 40;
 
-		// DRAW STUFF HERE:
+		// Dibuja
 
 		curCol = (x + PACMAN_SIZE / 2) / PACMAN_SIZE;
 		curRow = (y + PACMAN_SIZE / 2) / PACMAN_SIZE;
@@ -271,8 +250,8 @@ public void run() {
 			mazeArray[curRow][curCol] = Maze.EMPTY_SQUARE;
 		}
 
-		// do ghost stuff
-		//ghost.move(curRow, curCol);
+		 /*do ghost stuff
+		ghost.move(curRow, curCol);*/
 		{
 			for (i = 1; i >= 0; i--) {
 				nextX = x + dx[i];
@@ -289,13 +268,12 @@ public void run() {
 					}
 					break;
 				}
-
-			}
 		}
+			
 		doDrawMouth();
-		//Move PacMan
+		//Mueve a Pacman
 		doMovePacman(nextX, nextY, hitWall, i);
-		// Make the mouth chomp
+		// Mueve la boca de Pacman
 		{
 			mouthOpenAngle = mouthOpenAngle + dMouthOpenAngle;
 
@@ -308,33 +286,41 @@ public void run() {
 				dMouthOpenAngle = 5;
 			}
 		}
-
-		// clear what we drew last time.
+		// Limpia lo que dibujamos la anterior vez
 		gBuf.clearRect(0, 0, MAX_X, MAX_Y);
 		pellets = doDrawMaze();
 		
 		//set the drawing color
 		gBuf.setColor(Color.yellow);
 
-		 // draw a PacMan
+		 // Dibuja a PacMan
 		 gBuf.fillArc(x, y, PACMAN_SIZE, PACMAN_SIZE, mouthStartAngle + mouthOpenAngle / 2, 360 - mouthOpenAngle);
 
-		// draw ghost
+		// Dibuja un fantasma
 		fantasma.move(curRow, curCol);			
 		gBuf.setColor(Color.red);
 		gBuf.fillRect(fantasma.getY(), fantasma.getX(), PACMAN_SIZE, PACMAN_SIZE);
-
 		
-		// repaint() will call paint(Graphics) which will call update(Graphics)
+		// repaint() llama a paint(Graphics) y este llama a actualizar los graficos
 		repaint();
-		
-
+			
 		//doResetMaze(pellets);
+		}
+		if (getX() == fantasma.getX()) {
+			if (getY() == fantasma.getY()) {
+				try {
+					System.out.println("Has muerto");
+				} catch (Throwable e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			}
 	}
+		}
 }
 
 private boolean doDidWeHitAWall(boolean hitWall) {
-	// Process each "cell" of the maze and paint it correctly
+	// Mira cada celda y la pinta correctamente
 	for (int xCorner = 0; xCorner < PACMAN_SIZE; xCorner += PACMAN_SIZE - 1) {
 		for (int yCorner = 0; yCorner < PACMAN_SIZE; yCorner += PACMAN_SIZE - 1) {
 			int col = (nextX + xCorner) / PACMAN_SIZE;
@@ -354,7 +340,7 @@ private void doComputeSleepTime() {
 	{
 
 		try {
-			// this code slows the applet down if it is on a really fast machine
+			// Controla la velocidad del applet
 			long sleepTime = Math.max(startTime - System.currentTimeMillis(), 10);
 			updateThread.sleep(sleepTime);
 		} catch (InterruptedException e) {
@@ -374,7 +360,7 @@ private void doMovePacman(int nextX, int nextY, boolean hitWall, int i) {
 			dy[1] = 0;
 		}
 
-		// Don't let him go off the sides of the screen
+		// Para que no se vaya por la izquierda o derecha
 		if (x > MAX_X - PACMAN_SIZE) {
 			x = MAX_X - PACMAN_SIZE;
 			dx[0] = 0;
@@ -386,7 +372,7 @@ private void doMovePacman(int nextX, int nextY, boolean hitWall, int i) {
 			dx[1] = 0;
 		}
 
-		// Don't let him go off the top or bottom of the screen
+		// Para que no se vaya por arriba o por abajo
 		if (y > MAX_Y - PACMAN_SIZE) {
 			y = MAX_Y - PACMAN_SIZE;
 			dy[i] = 0;
@@ -398,6 +384,7 @@ private void doMovePacman(int nextX, int nextY, boolean hitWall, int i) {
 			dy[1] = 0;
 		}
 	}
+
 }
 
 private void doDrawMouth() {
@@ -470,10 +457,11 @@ public void start()
 		updateThread = new Thread(this, "Game");
 		updateThread.start();
 		startTime = System.currentTimeMillis();
+	
 	}
 }
 
-// This method is called when the applet is stopped. 
+// Se llama a este metodo cuando el applet para 
 public void stop()
 {
 	updateThread = null;
@@ -488,9 +476,7 @@ public void update(Graphics g)
 	g.drawImage(imgBuf, 0, 0, this);
 
 }
-/**
- * Cell constructor comment.
- */
+//Celdas
 public Main() {
 	super();
 	for (int i = 0; i < walls.length;i++)

@@ -67,7 +67,6 @@ public class Maze
 			{
 				mazearray[x][y].walls[outDirection] = false;
 				mazearray[x][mazearray[x].length - y - 1].walls[mirrorDirection(outDirection)] = false;
-
 				generateMaze(outX, outY, reverseDirection(outDirection));
 			}
 		}
